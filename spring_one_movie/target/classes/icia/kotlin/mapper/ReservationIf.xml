@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace=패키지명과 인터페이스 명과 같아야한다 -->
+<mapper namespace="icia.kotlin.mapper.ReservationIf">
+	<select id="getMovieList" resultType="icia.kotlin.beans.Movie">
+		<!-- id=매서드 이름과 동일해야한다 resultType 은 리턴과 같다 -->
+		<!-- QUERY에 포함된 문자중 < > & || 등이 있다면 XML 파싱을 하지 않도록 하는 역활 : <![CDATA[]] -->
+	<![CDATA[
+		SELECT mv_code as mvCode,mv_name as mvName,mv_grade as mvGrade,mv_status as mvStatus,mv_image as mvImage,mv_comments as mvComments FROM MV where mv_status != 'C'
+	]]>
+		<if test='mvCode != null'>
+	<![CDATA[ and mv_code = #{mvCode}]]>
+		</if>
+	</select>
+
+	<select id="getScreenInfo" resultType="icia.kotlin.beans.Movie">
+   <![CDATA[
+   SELECT SI.SI_MVCODE AS mvCode,
+   MV.MV_NAME AS mvName,
+   MV.MV_GRADE AS mvGrade,
+   SI.SI_SCNUMBER AS siScreen,
+   TO_CHAR(SI.SI_DATETIME,'HH24MI') AS mvDateTime
+   FROM SI INNER JOIN MV ON SI.SI_MVCODE = MV.MV_CODE
+   WHERE SI_MVCODE=#{mvCode} AND TO_CHAR(SI_DATETIME,'YYYY-MM-DD')=#{mvDate}
+   ]]>
+	</select>
+
+	<select id="getSeat" resultType="icia.kotlin.beans.Seat">
+   <![CDATA[
+   SELECT IS_SEAT AS SEATNUM,
+    IS_TYPE AS SEATTYPE
+	FROM "IS"
+	WHERE IS_SCNUMBER = #{siScreen}
+	UNION
+	SELECT RD_SEAT AS SEATNUM,
+    RD_TYPE AS SEATTYPE
+	FROM RD
+	WHERE RD_RVCODE IN(SELECT RV_CODE FROM RV WHERE RV.RV_SISCNUMBER = #{siScreen} AND TO_CHAR(RV.RV_SIDATETIME, 'YYYYMMDDHH24MI') = #{mvDateTime})
+   ]]>
+	</select>
+</mapper>

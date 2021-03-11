@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3xsd">
+   
+   <!-- Root Context: defines shared resources visible to all other web components -->
+   <!-- DB연결 정보 -->
+      <bean id="rhkrdudrb" class="com.zaxxer.hikari.HikariConfig">
+      <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+      <property name="jdbcUrl" value="jdbc:oracle:thin:@106.243.194.230:7002:xe" />
+      <property name="username" value="ADMIN1" />
+      <property name="password" value="5678" />
+   </bean>
+   <!-- DBCP정보 -->
+   <bean id="Data" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+      <constructor-arg ref="rhkrdudrb" />
+   </bean>
+   
+   <!--SqlSession 정보  -->
+   <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean" >
+   <property name="dataSource" ref="Data"></property>
+   </bean>
+   
+   <!--Transaction 정보  -->
+   <bean id="tran" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+   	<property name="dataSource" ref="Data"></property>
+   </bean>
+   
+   <mybatis-spring:scan base-package="icia.kotlin.mapper"/>
+</beans>
